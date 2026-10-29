@@ -71,30 +71,24 @@ jobs:
       - name: Preparar ferramentas Android
         run: |
           SDK="$HOME/.buildozer/android/platform/android-sdk"
-
-          echo "A preparar o SDK Android..."
-
-          mkdir -p "$SDK"
-
-          find "$HOME/.buildozer" -type f -name sdkmanager \
-            -print 2>/dev/null || true
-
-          SDKMANAGER="$(find "$HOME/.buildozer" \
-            -type f -name sdkmanager 2>/dev/null | head -n 1)"
+          SDKMANAGER="$(find "$HOME/.buildozer" -type f -name sdkmanager 2>/dev/null | head -n 1)"
 
           if [ -z "$SDKMANAGER" ]; then
-            echo "O sdkmanager ainda não foi encontrado."
-            echo "A primeira compilação vai preparar o ambiente."
+            echo "Erro: sdkmanager não encontrado."
             exit 1
           fi
 
-          yes | "$SDKMANAGER" \
-            --sdk_root="$SDK" --licenses || true
+          echo "A aceitar as licenças Android..."
+          yes | "$SDKMANAGER" --sdk_root="$SDK" --licenses || true
 
+          echo "A instalar as ferramentas necessárias..."
           "$SDKMANAGER" --sdk_root="$SDK" \
             "platform-tools" \
             "platforms;android-35" \
-            "build-tools;35.0.0"
+            "build-tools;37.0.0"
+
+          echo "A verificar a instalação do AIDL..."
+          find "$SDK/build-tools" -type f -name aidl -print
 
       - name: Compilar APK
         run: |
