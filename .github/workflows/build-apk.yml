@@ -1,4 +1,4 @@
-name: Compilar APK da Minha IA Aprendiz
+Name: Compilar APK da Minha IA Aprendiz
 
 on:
   workflow_dispatch:
@@ -72,16 +72,14 @@ jobs:
       - name: Aceitar licencas Android
         run: |
           SDK="$HOME/.buildozer/android/platform/android-sdk"
-
           mkdir -p "$SDK/licenses"
 
+          # Adiciona os hashes das licenças oficiais do Android SDK
           printf '%s\n' \
             '8933bad161af4178b1185d1a37fbf41ea5269c55' \
-            > "$SDK/licenses/android-sdk-license"
-
-          printf '%s\n' \
             '84831b9409646a918e30573bab4c9c91346d8abd' \
-            >> "$SDK/licenses/android-sdk-license"
+            '24333f8a63b6825ea9c5514f83c28e9b0d4b2efa' \
+            > "$SDK/licenses/android-sdk-license"
 
           printf '%s\n' \
             'd56f5187479451eabf01fb78af6dfcb131a6481e' \
@@ -99,3 +97,4 @@ jobs:
           path: bin/*.apk
           if-no-files-found: error
           retention-days: 7
+          
