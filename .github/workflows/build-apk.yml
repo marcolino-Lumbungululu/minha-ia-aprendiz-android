@@ -1,32 +1,65 @@
-[app]
+name: Compilar APK da Minha IA Aprendiz
 
-title = Minha IA Aprendiz
-package.name = minhaiaaprendiz
-package.domain = org.minhaia
+on:
+  workflow_dispatch:
 
-source.dir = .
-source.include_exts = py,db
-source.exclude_dirs = .git,__pycache__,venv,.buildozer,bin
+permissions:
+  contents: read
 
-version = 1.0.0
+jobs:
+  build:
+    name: Construir APK Android
+    runs-on: ubuntu-22.04
 
-requirements = python3,kivy
+    steps:
+      - name: Obter ficheiros do repositorio
+        uses: actions/checkout@v4
 
-orientation = portrait
-fullscreen = 0
+      - name: Preparar Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
 
-android.permissions = INTERNET
+      - name: Preparar Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
 
-android.api = 35
-android.minapi = 23
-android.ndk = 28c
-android.build_tools_version = 34.0.0
-android.accept_sdk_license = True
-android.archs = arm64-v8a
+      - name: Instalar dependencias do sistema
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential git zip unzip autoconf libtool pkg-config zlib1g-dev libncurses-dev libffi-dev libssl-dev
 
-android.debug_artifact = apk
+      - name: Instalar Buildozer
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install "Cython==0.29.36" buildozer
 
-[buildozer]
+      - name: Extrair codigo do projeto
+        run: |
+          test -f minha_ia_apk_codigo.zip
+          unzip -o minha_ia_apk_codigo.zip -d .
+          test -f main.py
+          test -f disciplinas.py
+          test -f motor_ligacao.py
+          test -f base_conhecimento.py
+          test -f resposta_inteligente.py
+          test -f conhecimento_inicial.db
+          test -f buildozer.spec
 
-log_level = 2
-warn_on_root = 1
+      - name: Verificar sintaxe Python
+        run: |
+          python -m py_compile main.py disciplinas.py motor_ligacao.py base_conhecimento.py resposta_inteligente.py
+
+      - name: Compilar APK
+        run: |
+          buildozer android debug
+
+      - name: Publicar APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: Minha-IA-Aprendiz-APK
+          path: bin/*.apk
+          if-no-files-found: error
+          retention-days: 7
