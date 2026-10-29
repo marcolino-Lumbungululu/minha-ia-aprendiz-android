@@ -79,15 +79,15 @@ jobs:
           fi
 
           echo "A aceitar as licenças Android..."
-          yes | "$SDKMANAGER" --sdk_root="$SDK" --licenses || true
+          yes s | "$SDKMANAGER" --sdk_root="$SDK" --licenses
 
-          echo "A instalar as ferramentas necessárias..."
+          echo "A instalar as ferramentas Android..."
           "$SDKMANAGER" --sdk_root="$SDK" \
             "platform-tools" \
             "platforms;android-35" \
             "build-tools;37.0.0"
 
-          echo "A verificar a instalação do AIDL..."
+          echo "A verificar o AIDL..."
           find "$SDK/build-tools" -type f -name aidl -print
 
       - name: Compilar APK
