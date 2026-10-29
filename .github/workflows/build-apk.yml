@@ -51,6 +51,7 @@ jobs:
         run: |
           test -f minha_ia_apk_codigo.zip
           unzip -o minha_ia_apk_codigo.zip -d .
+
           test -f main.py
           test -f disciplinas.py
           test -f motor_ligacao.py
@@ -68,27 +69,23 @@ jobs:
             base_conhecimento.py \
             resposta_inteligente.py
 
-      - name: Preparar ferramentas Android
+      - name: Aceitar licencas Android
         run: |
           SDK="$HOME/.buildozer/android/platform/android-sdk"
-          SDKMANAGER="$(find "$HOME/.buildozer" -type f -name sdkmanager 2>/dev/null | head -n 1)"
 
-          if [ -z "$SDKMANAGER" ]; then
-            echo "Erro: sdkmanager não encontrado."
-            exit 1
-          fi
+          mkdir -p "$SDK/licenses"
 
-          echo "A aceitar as licenças Android..."
-          yes s | "$SDKMANAGER" --sdk_root="$SDK" --licenses
+          printf '%s\n' \
+            '8933bad161af4178b1185d1a37fbf41ea5269c55' \
+            > "$SDK/licenses/android-sdk-license"
 
-          echo "A instalar as ferramentas Android..."
-          "$SDKMANAGER" --sdk_root="$SDK" \
-            "platform-tools" \
-            "platforms;android-35" \
-            "build-tools;37.0.0"
+          printf '%s\n' \
+            '84831b9409646a918e30573bab4c9c91346d8abd' \
+            >> "$SDK/licenses/android-sdk-license"
 
-          echo "A verificar o AIDL..."
-          find "$SDK/build-tools" -type f -name aidl -print
+          printf '%s\n' \
+            'd56f5187479451eabf01fb78af6dfcb131a6481e' \
+            > "$SDK/licenses/android-sdk-preview-license"
 
       - name: Compilar APK
         run: |
