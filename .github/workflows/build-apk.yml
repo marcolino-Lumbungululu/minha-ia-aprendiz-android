@@ -68,6 +68,34 @@ jobs:
             base_conhecimento.py \
             resposta_inteligente.py
 
+      - name: Preparar ferramentas Android
+        run: |
+          SDK="$HOME/.buildozer/android/platform/android-sdk"
+
+          echo "A preparar o SDK Android..."
+
+          mkdir -p "$SDK"
+
+          find "$HOME/.buildozer" -type f -name sdkmanager \
+            -print 2>/dev/null || true
+
+          SDKMANAGER="$(find "$HOME/.buildozer" \
+            -type f -name sdkmanager 2>/dev/null | head -n 1)"
+
+          if [ -z "$SDKMANAGER" ]; then
+            echo "O sdkmanager ainda não foi encontrado."
+            echo "A primeira compilação vai preparar o ambiente."
+            exit 1
+          fi
+
+          yes | "$SDKMANAGER" \
+            --sdk_root="$SDK" --licenses || true
+
+          "$SDKMANAGER" --sdk_root="$SDK" \
+            "platform-tools" \
+            "platforms;android-35" \
+            "build-tools;35.0.0"
+
       - name: Compilar APK
         run: |
           buildozer android debug
