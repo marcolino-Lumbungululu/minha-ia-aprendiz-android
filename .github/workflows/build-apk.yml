@@ -30,18 +30,9 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y \
-            build-essential \
-            git \
-            zip \
-            unzip \
-            autoconf \
-            automake \
-            libtool \
-            pkg-config \
-            zlib1g-dev \
-            libncurses-dev \
-            libffi-dev \
-            libssl-dev
+            build-essential git zip unzip \
+            autoconf automake libtool pkg-config \
+            zlib1g-dev libncurses-dev libffi-dev libssl-dev
 
       - name: Instalar Buildozer
         run: |
@@ -52,25 +43,28 @@ jobs:
         run: |
           unzip -o minha_ia_apk_codigo.zip -d .
           test -f main.py
-          test -f disciplinas.py
-          test -f motor_ligacao.py
-          test -f base_conhecimento.py
-          test -f resposta_inteligente.py
-          test -f conhecimento_inicial.db
           test -f buildozer.spec
+          test -f conhecimento_inicial.db
 
-      - name: Verificar sintaxe
+      - name: Verificar Python
         run: |
-          python -m py_compile \
-            main.py \
-            disciplinas.py \
-            motor_ligacao.py \
-            base_conhecimento.py \
-            resposta_inteligente.py
+          python -m py_compile main.py disciplinas.py motor_ligacao.py base_conhecimento.py resposta_inteligente.py
 
-      - name: Confirmar aceitação automática
+      - name: Preparar Android SDK
         run: |
-          grep -n "^android.accept_sdk_license = True$" buildozer.spec
+          SDK="$HOME/.buildozer/android/platform/android-sdk"
+          mkdir -p "$SDK"
+
+          yes | sdkmanager --sdk_root="$SDK" --licenses || true
+
+          sdkmanager --sdk_root="$SDK" \
+            "platform-tools" \
+            "platforms;android-35" \
+            "build-tools;34.0.0"
+
+          test -x "$SDK/build-tools/34.0.0/aidl"
+
+          echo "AIDL instalado com sucesso."
 
       - name: Compilar APK
         run: |
