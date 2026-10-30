@@ -29,7 +29,19 @@ jobs:
       - name: Instalar dependencias
         run: |
           sudo apt-get update
-          sudo apt-get install -y build-essential git zip unzip autoconf libtool pkg-config zlib1g-dev libncurses-dev libffi-dev libssl-dev
+          sudo apt-get install -y \
+            build-essential \
+            git \
+            zip \
+            unzip \
+            autoconf \
+            automake \
+            libtool \
+            pkg-config \
+            zlib1g-dev \
+            libncurses-dev \
+            libffi-dev \
+            libssl-dev
 
       - name: Instalar Buildozer
         run: |
@@ -40,18 +52,28 @@ jobs:
         run: |
           unzip -o minha_ia_apk_codigo.zip -d .
           test -f main.py
+          test -f disciplinas.py
+          test -f motor_ligacao.py
+          test -f base_conhecimento.py
+          test -f resposta_inteligente.py
+          test -f conhecimento_inicial.db
           test -f buildozer.spec
 
       - name: Verificar sintaxe
         run: |
-          python -m py_compile main.py disciplinas.py motor_ligacao.py base_conhecimento.py resposta_inteligente.py
+          python -m py_compile \
+            main.py \
+            disciplinas.py \
+            motor_ligacao.py \
+            base_conhecimento.py \
+            resposta_inteligente.py
 
-      - name: Compilar APK com licencas
-        env:
-          BUILDOZER_WARN_ON_ROOT: "0"
+      - name: Confirmar aceitação automática
         run: |
-          export ANDROID_SDK_ROOT="$HOME/.buildozer/android/platform/android-sdk"
-          mkdir -p "$ANDROID_SDK_ROOT/licenses"
+          grep -n "^android.accept_sdk_license = True$" buildozer.spec
+
+      - name: Compilar APK
+        run: |
           buildozer android debug
 
       - name: Publicar APK
