@@ -20,11 +20,8 @@ android.permissions = INTERNET
 android.api = 35
 android.minapi = 23
 android.ndk = 28c
-android.build_tools_version = 34.0.0
 android.accept_sdk_license = True
-
 android.archs = arm64-v8a
-
 android.debug_artifact = apk
 
 [buildozer]
